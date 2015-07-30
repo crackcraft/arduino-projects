@@ -41,17 +41,6 @@
 
 OneWire  ds(PIN);
 
-
-
-uint8_t w1_dow_crc8( uint8_t (*addr)[9], uint8_t len) {
-  for(int i=0; i<8; i++) {
-    Serial.print((*addr)[i], HEX);
-    Serial.print(" ");
-  }
-  Serial.println();
-  OneWire::crc8((uint8_t *)(*addr), len);
-}
-
 char * str_read1_onewire    = "Waiting for a key... "; //Жду ключ...   ";
 char * str_read2_onewire    = "Read the key "; //Прочитан ключ ";
 char * str_read3_onewire    = "Key in memory "; //Ключ в памяти ";
@@ -266,8 +255,8 @@ uint8_t ReadOneWire() {
         for (i=0; i < 8; i++) {
                 rom_code[i] = ds.read();
         }
-    } while ((ds.reset() == 1) & (w1_dow_crc8(&rom_code,7) != rom_code[7] )) ;
-    if (w1_dow_crc8(&rom_code,7) != rom_code[7] ) return 0; else return 1;
+    } while ((ds.reset() == 1) & (OneWire::crc8(rom_code,7) != rom_code[7] )) ;
+    if (OneWire::crc8(rom_code,7) != rom_code[7] ) return 0; else return 1;
 }
 
 void verifyKey() {
@@ -327,7 +316,7 @@ void startWriteAuto() {
     nokia_cls();
     nokia_gotoxy(0, 0);
     lcdPutStringFLASH(str_write_auto, _FALSE);
-    rom_code_saved[7] = w1_dow_crc8(&rom_code_saved,7);
+    rom_code_saved[7] = OneWire::crc8(rom_code_saved,7);
 }
 
 void startWriteTM2004() {
@@ -335,7 +324,7 @@ void startWriteTM2004() {
     nokia_cls();
     nokia_gotoxy(0, 0);
     lcdPutStringFLASH(str_write_tm2004, _FALSE);
-    rom_code_saved[7] = w1_dow_crc8(&rom_code_saved,7);
+    rom_code_saved[7] = OneWire::crc8(rom_code_saved,7);
 }
 
 void startWriteRW1990_2() {
@@ -343,7 +332,7 @@ void startWriteRW1990_2() {
     nokia_cls();
     nokia_gotoxy(0, 0);
     lcdPutStringFLASH(str_write_rw1990_2, _FALSE);
-    rom_code_saved[7] = w1_dow_crc8(&rom_code_saved,7);
+    rom_code_saved[7] = OneWire::crc8(rom_code_saved,7);
 }
 
 void startWriteRW1990_1() {
@@ -351,7 +340,7 @@ void startWriteRW1990_1() {
     nokia_cls();
     nokia_gotoxy(0, 0);
     lcdPutStringFLASH(str_write_rw1990_1, _FALSE);
-    rom_code_saved[7] = w1_dow_crc8(&rom_code_saved,7);
+    rom_code_saved[7] = OneWire::crc8(rom_code_saved,7);
 }
 
 void programmPulse() {
