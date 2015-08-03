@@ -248,7 +248,7 @@ void startMenu() {
 
 
 // ----------------------------------------------------------------
-uint8_t ReadOneWire() {
+uint8_t readOneWire() {
     uint8_t i;
     do {
         ds.write(0x33);
@@ -465,48 +465,42 @@ uint8_t typeKey() {
     }
 }
 
-uint8_t writeOneWireRW1990( uint8_t data ) {
-    uint8_t i;
-    switch (data) {
-        case TYPE_KEY_RW1990_1: {
-            if (ds.reset() == 1) {
-                ds.write(0xD1); //Разрешаем запись
-                timeSlot(0);
-            }
-            if (ds.reset() == 1) {
-                ds.write(0xD5); //Команда записи
-                for (i = 0; i < 8; i++){
-                    w1_save(~rom_code_saved[i]);
-                }
-            }
-            if (ds.reset() == 1) {
-                ds.write(0xD1); //Запрещаем запись
-                timeSlot(1);
-            }
 
-        } break;
-
-        case TYPE_KEY_RW1990_2: {
-            if (ds.reset() == 1) {
-                ds.write(0x1D); //Разрешаем запись
-                timeSlot(1);
-            }
-            if (ds.reset() == 1) {
-                ds.write(0xD5); //Команда записи
-                for (i = 0; i < 8; i++){
-                        w1_save(rom_code_saved[i]);
-                }
-            }
-            if (ds.reset() == 1) {
-                ds.write(0x1D); //Запрещаем запись
-                timeSlot(0);
-            }
-        } break;
-    };
-
+int writeOneWireRW1990_1() {
+    if (ds.reset() == 1) {
+        ds.write(0xD1); //Разрешаем запись
+        timeSlot(0);
+    }
+    if (ds.reset() == 1) {
+        ds.write(0xD5); //Команда записи
+        for (int i = 0; i < 8; i++){
+            w1_save(~rom_code_saved[i]);
+        }
+    }
+    if (ds.reset() == 1) {
+        ds.write(0xD1); //Запрещаем запись
+        timeSlot(1);
+    }
     return 1;
 }
 
+int writeOneWireRW1990_2() {
+    if (ds.reset() == 1) {
+        ds.write(0x1D); //Разрешаем запись
+        timeSlot(1);
+    }
+    if (ds.reset() == 1) {
+        ds.write(0xD5); //Команда записи
+        for (int i = 0; i < 8; i++){
+                w1_save(rom_code_saved[i]);
+        }
+    }
+    if (ds.reset() == 1) {
+        ds.write(0x1D); //Запрещаем запись
+        timeSlot(0);
+    }
+    return 1;
+}
 
 void setup(void) {
   Serial.begin(9600);
@@ -536,7 +530,7 @@ void loop(void) {
     if (ds.reset() == 1) {
         switch (mode) {
             case (MODE_READ): {
-                if (ReadOneWire() == 1) {
+                if (readOneWire() == 1) {
                         memcpy(rom_code_saved, rom_code, 9);
                         lcdPutKey();
                         startMenu();
@@ -544,7 +538,7 @@ void loop(void) {
             } break;
 
             case (MODE_VERIFY): {
-                if (ReadOneWire() == 1) {
+                if (readOneWire() == 1) {
                         memcpy(rom_code_verify, rom_code, 9);
                         verifyKey();
                         startMenu();
@@ -573,7 +567,7 @@ void loop(void) {
             case (MODE_WRITE_TM2004): {
                         if (writeOneWireTM2004() == 1) {
                                 if (ds.reset() == 1) {
-                                       if (ReadOneWire() == 1) {
+                                       if (readOneWire() == 1) {
                                                 memcpy(rom_code_verify, rom_code, 9);
                                                 verifyKey();
                                                 startMenu();
@@ -583,9 +577,9 @@ void loop(void) {
             } break;
 
             case (MODE_WRITE_RW1990_1): {
-                        if (writeOneWireRW1990(TYPE_KEY_RW1990_1) == 1) {
+                        if (writeOneWireRW1990_1() == 1) {
                                 if (ds.reset() == 1) {
-                                       if (ReadOneWire() == 1) {
+                                       if (readOneWire() == 1) {
                                                 memcpy(rom_code_verify, rom_code, 9);
                                                 verifyKey();
                                                 startMenu();
@@ -595,9 +589,9 @@ void loop(void) {
             } break;
 
             case (MODE_WRITE_RW1990_2): {
-                        if (writeOneWireRW1990(TYPE_KEY_RW1990_2) == 1) {
+                        if (writeOneWireRW1990_2() == 1) {
                                 if (ds.reset() == 1) {
-                                       if (ReadOneWire() == 1) {
+                                       if (readOneWire() == 1) {
                                                 memcpy(rom_code_verify, rom_code, 9);
                                                 verifyKey();
                                                 startMenu();
@@ -610,9 +604,9 @@ void loop(void) {
                 type_key = typeKey();
                 switch (type_key) {
                     case TYPE_KEY_RW1990_1: {
-                        if (writeOneWireRW1990(TYPE_KEY_RW1990_1) == 1) {
+                        if (writeOneWireRW1990_1() == 1) {
                                 if (ds.reset() == 1) {
-                                       if (ReadOneWire() == 1) {
+                                       if (readOneWire() == 1) {
                                                 memcpy(rom_code_verify, rom_code, 9);
                                                 verifyKey();
                                                 nokia_gotoxy(0, 5);
@@ -624,9 +618,9 @@ void loop(void) {
                     } break;
 
                     case TYPE_KEY_RW1990_2: {
-                        if (writeOneWireRW1990(TYPE_KEY_RW1990_2) == 1) {
+                        if (writeOneWireRW1990_2() == 1) {
                                 if (ds.reset() == 1) {
-                                       if (ReadOneWire() == 1) {
+                                       if (readOneWire() == 1) {
                                                 memcpy(rom_code_verify, rom_code, 9);
                                                 verifyKey();
                                                 nokia_gotoxy(0, 5);
@@ -640,7 +634,7 @@ void loop(void) {
                     case TYPE_KEY_TM2004: {
                         if (writeOneWireTM2004() == 1) {
                                 if (ds.reset() == 1) {
-                                       if (ReadOneWire() == 1) {
+                                       if (readOneWire() == 1) {
                                                 memcpy(rom_code_verify, rom_code, 9);
                                                 verifyKey();
                                                 nokia_gotoxy(0, 5);
